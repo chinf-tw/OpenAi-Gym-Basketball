@@ -1,15 +1,19 @@
 import math
 import time
 import numpy as np
-class testEnv(object):
+class basketballEnv(object):
     """
     Actions:
         Type: Discrete(2)
         Num	Action
-        0	Push cart to the left
-        1	Push cart to the right
-        2   Push cart to the up
-        3   Push cart to the down
+        0	Push agent to the left
+        1	Push agent to the right
+        2   Push agent to the up
+        3   Push agent to the down
+        4   Agent dribble the ball to left
+        5   Agent dribble the ball to right
+        6   Agent dribble the ball to up
+        7   Agent dribble the ball to down
 
     """
     def __init__(self,v="v0"):
@@ -55,18 +59,39 @@ class testEnv(object):
         
 
     def step(self,action):
-        x,y = self.agentState
-        if action == 0:
-            x -= 1
-        elif action == 1:
-            x += 1
-        elif action == 2:
-            y += 1
-        elif action == 3:
-            y -= 1
-        if x < self.col and y < self.row :
-            self.agentState = (x,y)
-        return self.agentState
+        agentX,agentY = self.agentState
+        ballX,ballY = self.basketballState
+        if action < 4 :
+            if action == 0:
+                agentX -= 1
+            elif action == 1:
+                agentX += 1
+            elif action == 2:
+                agentY += 1
+            elif action == 3:
+                agentY -= 1
+        else:
+            if self.agentState == self.basketballState :
+                if action == 4:
+                    agentX -= 1
+                    ballX -= 1
+                elif action == 5:
+                    agentX += 1
+                    ballX += 1
+                elif action == 6:
+                    agentY += 1
+                    ballY += 1
+                elif action == 7:
+                    agentY -= 1
+                    ballY -= 1
+        done = False
+        if agentX < self.col and agentY < self.row and agentX >= 0 and agentY >= 0 :
+            self.agentState = (agentX,agentY)
+            self.basketballState = (ballX,ballY)
+        else:
+            done = True
+            pass
+        return np.array(self.agentState), done
 
     def render(self, mode='human'):
         screen_width = self.screen_width
@@ -139,29 +164,42 @@ class testEnv(object):
         if self.viewer:
             self.viewer.close()
             self.viewer = None
+    def reset(self):
+        self.agentState = (0,0)
+        self.basketballState = (0,self.row - 1)
+        pass
 
-env = testEnv("v0")
+env = basketballEnv("v0")
 import random
 state = None
-for i in range(6):
+
+speed = 0.1
+
+for i in range(10):
     env.render()
-    if state :
-        print(state)
-    if i < 4 :
-        action = 1
-    else:
+    if state is not None :
+        print("action: {} , state: {}".format(action,state))
+        if done :
+            env.reset()
+    if i < 5 :
         action = 2
+    else:
+        action = 5
         pass
-    state = env.step(action)
-    time.sleep(0.5)
-for _ in range(10):
+    state, done = env.step(action)
+    time.sleep(speed)
+    
+for _ in range(100):
     
     env.render()
-    if state :
-        print(state)
-    action = int(random.random()*3)
-    time.sleep(0.5)
-    state = env.step(action)
+    if state is not None:
+        print("action: {} , state: {}".format(action,state))
+        if done :
+            env.reset()
+    action = int(random.random()*7)
+    time.sleep(speed)
+    
+    state, done = env.step(action)
     
     pass
 env.close()
