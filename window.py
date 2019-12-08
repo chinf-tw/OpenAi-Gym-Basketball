@@ -1,3 +1,4 @@
+import math
 import time
 class testEnv(object):
     """
@@ -87,8 +88,11 @@ class testEnv(object):
             self.viewer.add_geom(basketball)
 
             # make the basket
-
-
+            bottomx,bottomy = minRadius*math.cos(math.pi/12),minRadius*0.5
+            basket = rendering.FilledPolygon([(0,minRadius), (-bottomx,-bottomy), (bottomx,-bottomy)])
+            self.baskettrans = rendering.Transform((self.block_width/2 + (self.col-1)*self.block_width,self.block_height/2 + (int(self.row/2)-1)*self.block_height))
+            basket.add_attr(self.baskettrans)
+            self.viewer.add_geom(basket)
 
         
         if self.state is None: return None
