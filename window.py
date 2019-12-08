@@ -64,7 +64,7 @@ class testEnv(object):
             y += 1
         elif action == 3:
             y -= 1
-        if x <= self.col or y <= self.row :
+        if x < self.col and y < self.row :
             self.agentState = (x,y)
         return self.agentState
 
@@ -107,7 +107,6 @@ class testEnv(object):
             self.viewer.add_geom(agent)
 
             # make the basketball
-            
             basketball = self.viewer.draw_circle(minRadius)
             self.basketballtrans = rendering.Transform()
             basketball.add_attr(self.basketballtrans)
@@ -158,9 +157,11 @@ for i in range(6):
 for _ in range(10):
     
     env.render()
+    if state :
+        print(state)
     action = int(random.random()*3)
-    time.sleep(2)
-    env.step(action)
+    time.sleep(0.5)
+    state = env.step(action)
     
     pass
 env.close()
