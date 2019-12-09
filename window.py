@@ -2,6 +2,7 @@ import math
 import time
 import numpy as np
 import gym
+import random
 class basketballEnv(gym.Env):
     """
     Description:
@@ -75,19 +76,27 @@ class basketballEnv(gym.Env):
         if v == "v0":
             self.col = 9
             self.row = 6
+            self.numberOfOpponent = 5
         elif v == "v1":
             self.col = 18
             self.row = 12
+            self.numberOfOpponent = 50
         elif v == "v2":
             self.col = 36
             self.row = 24
+            self.numberOfOpponent = 250
         
         self.block_width = self.screen_width / self.col
         self.block_height = self.screen_height / self.row
-        self.agentState = (0,0)
-        self.basketballState = (0,self.row - 1)
-        self.basketState = (self.col-1, int(self.row/2))
 
+        # init all state
+        
+        self.initState()
+
+        if len(self.opponentsState) != self.numberOfOpponent :
+            raise ValueError("opponents len isn't equal ")
+
+        # init positionTable
         self.positionTable = np.zeros((2, self.row, self.col))
         for r in range(self.row):
             for c in range(self.col):
@@ -107,7 +116,18 @@ class basketballEnv(gym.Env):
             pass
         pass
         
-        
+    def initState(self):
+        # self.agentState = (0,0)
+        self.agentState = (int(random.random()*self.col - 1),int(random.random()*self.row - 1))
+        self.basketballState = (0,self.row - 1)
+        self.basketState = (self.col-1, int(self.row/2))
+        self.opponentsState = []
+        while len(self.opponentsState) < self.numberOfOpponent:
+            x = int(random.random()*self.col - 1)
+            y = int(random.random()*self.row - 1)
+            if (x,y) not in self.opponentsState and (x,y) not in [self.agentState,self.basketballState,self.basketState] :
+                self.opponentsState.append((x,y))
+            pass
 
     def step(self,action):
         agentX,agentY = self.agentState
@@ -135,13 +155,15 @@ class basketballEnv(gym.Env):
                 elif action == 7:
                     agentY -= 1
                     ballY -= 1
-        done = False
-        if agentX < self.col and agentY < self.row and agentX >= 0 and agentY >= 0 :
+        
+        
+        if agentX < self.col and agentY < self.row and agentX >= 0 and agentY >= 0 and (agentX,agentY) not in self.opponentsState:
             self.agentState = (agentX,agentY)
             self.basketballState = (ballX,ballY)
-        else:
-            done = True
-            pass
+        
+        done = agentX >= self.col or agentY >= self.row 
+
+        
         return np.array(self.agentState), done
 
     def render(self, mode='human'):
@@ -180,6 +202,7 @@ class basketballEnv(gym.Env):
             agent = rendering.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
             self.agenttrans = rendering.Transform()
             agent.add_attr(self.agenttrans)
+            agent.set_color(195/255, 41/255, 109/255)
             self.viewer.add_geom(agent)
 
             # make the basketball
@@ -194,7 +217,19 @@ class basketballEnv(gym.Env):
             basket = rendering.FilledPolygon([(0,minRadius), (-bottomx,-bottomy), (bottomx,-bottomy)])
             self.baskettrans = rendering.Transform(self.stateToPosition(self.basketState))
             basket.add_attr(self.baskettrans)
+            basket.set_color(61/255,225/255,149/255)
             self.viewer.add_geom(basket)
+
+            # make the Opponent
+            # the size and shape is equal the agent
+            self.opponenttrans = []
+            for opponentPosition in self.opponentsState:
+                opponent = rendering.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
+                opponenttran = rendering.Transform(self.stateToPosition(opponentPosition))
+                opponent.add_attr(opponenttran)
+                self.opponenttrans.append(opponenttran)
+                self.viewer.add_geom(opponent)
+                pass
 
         
         if self.agentState is None: return None
@@ -216,35 +251,24 @@ class basketballEnv(gym.Env):
             self.viewer.close()
             self.viewer = None
     def reset(self):
-        self.agentState = (0,0)
-        self.basketballState = (0,self.row - 1)
+        self.initState()
+        for i in range(len(self.opponenttrans)) :
+            x,y = self.stateToPosition(self.opponentsState[i])
+            self.opponenttrans[i].set_translation(x,y)
         pass
 
 env = basketballEnv("v0")
-import random
+
 state = None
 
 speed = 0.1
 
-for i in range(10):
-    env.render()
-    if state is not None :
-        print("action: {} , state: {}".format(action,state))
-        if done :
-            env.reset()
-    if i < 5 :
-        action = 2
-    else:
-        action = 5
-        pass
-    state, done = env.step(action)
-    time.sleep(speed)
-    
+
 for _ in range(100):
     
     env.render()
     if state is not None:
-        print("action: {} , state: {}".format(action,state))
+        # print("action: {} , state: {}".format(action,state))
         if done :
             env.reset()
     action = int(random.random()*7)
