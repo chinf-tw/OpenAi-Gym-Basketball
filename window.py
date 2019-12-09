@@ -60,9 +60,9 @@ class basketballEnv(gym.Env):
 
 
     Starting State:
-        Agent is on the         (0,0)
-        Basketball is on the    (0,blockRow)
-        basket is on the        (blockColumn,blockRow/2)
+        Agent       is on the (0,0)
+        Basketball  is on the (0,blockRow)
+        basket      is on the (blockColumn,blockRow/2)
 
     Episode Termination:
         The episode will end if the robot scores a point or if the robot leaves the playing field.
