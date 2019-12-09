@@ -63,7 +63,7 @@ class basketballEnv(gym.Env):
     Starting State:
         Agent       is on the (0,0)
         Basketball  is on the (0,blockRow)
-        basket      is on the (blockColumn,blockRow/2)
+        basket      is on the (blockColumn*0.8,blockRow/2)
 
     Episode Termination:
         The episode will end if the robot scores a point or if the robot leaves the playing field.
@@ -132,6 +132,8 @@ class basketballEnv(gym.Env):
     def step(self,action):
         agentX,agentY = self.agentState
         ballX,ballY = self.basketballState
+        reward = 0
+        # Movement
         if action < 4 :
             if action == 0:
                 agentX -= 1
@@ -141,7 +143,8 @@ class basketballEnv(gym.Env):
                 agentY += 1
             elif action == 3:
                 agentY -= 1
-        else:
+        # Ball Handling
+        elif action < 8:
             if self.agentState == self.basketballState :
                 if action == 4:
                     agentX -= 1
@@ -155,16 +158,61 @@ class basketballEnv(gym.Env):
                 elif action == 7:
                     agentY -= 1
                     ballY -= 1
-        
+                    pass
+                pass
+            pass
+        # Shoot
+        elif action == 8 and self.agentState == self.basketballState:
+            basketX,basketY = self.basketState
+            distance = math.sqrt((agentX-basketX)**2 + (agentY-basketY)**2)
+            # Distance is less than 1 cell
+            if distance < 1 :
+                # success is +10
+                if random.random() > 0.9 :
+                    reward = 10
+                    done = True
+                    return np.array(self.agentState),reward, done, {}
+                else:
+                    self.shootfail()
+                    pass
+                pass
+            elif distance >= 1 and distance < 3:
+                if random.random() > 0.66 :
+                    reward = 10
+                    done = True
+                    return np.array(self.agentState),reward, done, {}
+                else:
+                    self.shootfail()
+                    pass
+                pass
+            elif distance >= 3 and distance < 4:
+                if random.random() > 0.10 :
+                    reward = 30
+                    done = True
+                    return np.array(self.agentState),reward, done, {}
+                else:
+                    self.shootfail()
+                    pass
+                pass
+            pass
         
         if agentX < self.col and agentY < self.row and agentX >= 0 and agentY >= 0 and (agentX,agentY) not in self.opponentsState:
             self.agentState = (agentX,agentY)
             self.basketballState = (ballX,ballY)
+        else:
+            # If the robot leaves the playing field, it will receive a penalty of -100.
+            reward = -100
+            pass
         
-        done = agentX >= self.col or agentY >= self.row 
+        done = agentX >= self.col or agentY >= self.row
 
         
-        return np.array(self.agentState), done
+        return np.array(self.agentState), reward, done, {}
+
+    def shootfail(self):
+        basketballState = (int(self.col*0.8),self.row//2)
+        basketballX,basketballY = self.stateToPosition(basketballState)
+        self.basketballtrans.set_translation(basketballX,basketballY)
 
     def render(self, mode='human'):
         screen_width = self.screen_width
@@ -264,7 +312,7 @@ state = None
 speed = 0.1
 
 
-for _ in range(100):
+for _ in range(1000):
     
     env.render()
     if state is not None:
@@ -274,7 +322,7 @@ for _ in range(100):
     action = int(random.random()*7)
     time.sleep(speed)
     
-    state, done = env.step(action)
+    state, reward, done, _ = env.step(action)
     
     pass
 env.close()
