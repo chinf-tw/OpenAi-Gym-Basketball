@@ -1,20 +1,71 @@
 import math
 import time
 import numpy as np
-class basketballEnv(object):
+import gym
+class basketballEnv(gym.Env):
     """
-    Actions:
-        Type: Discrete(2)
-        Num	Action
-        0	Push agent to the left
-        1	Push agent to the right
-        2   Push agent to the up
-        3   Push agent to the down
-        4   Agent dribble the ball to left
-        5   Agent dribble the ball to right
-        6   Agent dribble the ball to up
-        7   Agent dribble the ball to down
+    Description:
+        In this assignment, you will compare the performance of several reinforcement learning algorithms in a simple basketball domain. You will also investigate the impact of different parameters on the performance of the reinforcement learning algorithm.
 
+    Version of block number:
+        version     blockColumn      blockRow
+        v0:         9           6
+        v1:         18          12
+        v2:         36          24
+
+    Observation: 
+        Type: Box(2)
+        Num	Observation                 Min         Max
+        0	agent state x               0           blockColumn
+        1	agent state y               0           blockRow
+
+    Actions:
+        Type: Discrete(9)
+        Movement:
+            Num	Action
+            0	Push agent to the left
+            1	Push agent to the right
+            2   Push agent to the up
+            3   Push agent to the down
+        Ball Handling:
+            Num	Action
+            4   Agent dribble the ball to left
+            5   Agent dribble the ball to right
+            6   Agent dribble the ball to up
+            7   Agent dribble the ball to down
+        Shoot:
+            Num	Action
+            8   Agent shoot the ball
+
+    Shoot:
+        success rate:
+            Note: the distance is Euclidean distance between the robot and the basket.
+
+            1. Distance is less than 1 cell:        90%
+            2. Distance is between 1 and 3 cell:    66%
+            3. Distance is between 3 and 4 cell:    10%
+
+        If the shot is unsuccessful, then the ball will be placed at location (0.8 * WIDTH, HEIGHT//2).
+
+
+    Reward:
+        Note: the distance is Euclidean distance between the robot and the basket.
+
+        Succeed to shoot:
+            1. Distance is less than 1 cell:        +10
+            2. Distance is between 1 and 3 cell:    +10
+            3. Distance is between 3 and 4 cell:    +30
+        
+        If the robot leaves the playing field, it will receive a penalty of -100.
+
+
+    Starting State:
+        Agent is on the         (0,0)
+        Basketball is on the    (0,blockRow)
+        basket is on the        (blockColumn,blockRow/2)
+
+    Episode Termination:
+        The episode will end if the robot scores a point or if the robot leaves the playing field.
     """
     def __init__(self,v="v0"):
         self.viewer = None
