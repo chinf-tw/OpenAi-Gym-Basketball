@@ -119,12 +119,12 @@ class basketballEnv(gym.Env):
         # self.agentState = (0,0)
         self.agentState = (int(random.random()*self.col - 1),int(random.random()*self.row - 1))
         self.basketballState = (0,self.row - 1)
-        self.basketState = (self.col-1, int(self.row/2))
+        self.basketState = (self.col-1, (self.row-1)/2)
         self.opponentsState = []
         while len(self.opponentsState) < self.numberOfOpponent:
             x = int(random.random()*self.col - 1)
             y = int(random.random()*self.row - 1)
-            if (x,y) not in self.opponentsState and (x,y) not in [self.agentState,self.basketballState,self.basketState] :
+            if (x,y) not in self.opponentsState and (x,y) not in [self.agentState,self.basketballState] :
                 self.opponentsState.append((x,y))
             pass
 
@@ -168,45 +168,37 @@ class basketballEnv(gym.Env):
             # Distance is less than 1 cell
             if distance < 1 :
                 # success is +10
-                if random.random() > 0.9 :
+                if random.random() <= 0.9 :
                     reward = 10
                     # The episode will end if the robot scores a point.
                     done = True
-                    return np.array(self.agentState),reward, done, {}
                 else:
                     self.shootfail()
                     pass
                 pass
             # Distance is between 1 and 3 cell
             elif distance >= 1 and distance < 3:
-                if random.random() > 0.66 :
+                if random.random() <= 0.66 :
                     # success is +10
                     reward = 10
                     # The episode will end if the robot scores a point.
                     done = True
-                    return np.array(self.agentState),reward, done, {}
                 else:
                     self.shootfail()
                     pass
-                pass
             # Distance is between 3 and 4 cell
             elif distance >= 3 and distance < 4:
-                if random.random() > 0.10 :
+                if random.random() <= 0.10 :
                     # success is +30
                     reward = 30
                     # The episode will end if the robot scores a point.
                     done = True
-                    return np.array(self.agentState),reward, done, {}
                 else:
                     self.shootfail()
                     pass
-                pass
             else:
                 self.shootfail()
-                
-                return np.array(self.agentState),reward, done, {}
-                
-            pass
+            return np.array(self.agentState),reward, done, {}
 
         # Determine if the action is still in range
         isCorrectMove = (agentX < self.col) and (agentY < self.row) and (agentX >= 0 and agentY >= 0)
@@ -220,8 +212,8 @@ class basketballEnv(gym.Env):
         # Determine if the action is still in Observation
         isHitObservation = (agentX,agentY) in self.opponentsState
         # 
-        isMoveInBasket = (agentX,agentY) in self.basketState
-        if isCorrectMove and not isHitObservation and not isMoveInBasket:
+        # isMoveInBasket = (agentX,agentY) in self.basketState
+        if isCorrectMove and not isHitObservation :
             self.agentState = (agentX,agentY)
             self.basketballState = (ballX,ballY)
             pass
@@ -282,9 +274,10 @@ class basketballEnv(gym.Env):
             self.viewer.add_geom(basketball)
 
             # make the basket
-            bottomx,bottomy = minRadius*math.cos(math.pi/12),minRadius*0.5
-            basket = rendering.FilledPolygon([(0,minRadius), (-bottomx,-bottomy), (bottomx,-bottomy)])
-            self.baskettrans = rendering.Transform(self.stateToPosition(self.basketState))
+            # bottomx,bottomy = minRadius*math.cos(math.pi/12),minRadius*0.5
+            # basket = rendering.FilledPolygon([(0,minRadius), (-bottomx,-bottomy), (bottomx,-bottomy)])
+            basket = self.viewer.draw_circle(minRadius*1.4)
+            self.baskettrans = rendering.Transform((self.screen_width,self.screen_height/2))
             basket.add_attr(self.baskettrans)
             basket.set_color(61/255,225/255,149/255)
             self.viewer.add_geom(basket)
