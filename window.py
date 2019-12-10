@@ -90,7 +90,6 @@ class basketballEnv(gym.Env):
         self.block_height = self.screen_height / self.row
 
         # init all state
-        
         self.initState()
 
         if len(self.opponentsState) != self.numberOfOpponent :
@@ -133,6 +132,7 @@ class basketballEnv(gym.Env):
         agentX,agentY = self.agentState
         ballX,ballY = self.basketballState
         reward = 0
+        done = False
         # Movement
         if action < 4 :
             if action == 0:
@@ -170,49 +170,67 @@ class basketballEnv(gym.Env):
                 # success is +10
                 if random.random() > 0.9 :
                     reward = 10
+                    # The episode will end if the robot scores a point.
                     done = True
                     return np.array(self.agentState),reward, done, {}
                 else:
                     self.shootfail()
                     pass
                 pass
+            # Distance is between 1 and 3 cell
             elif distance >= 1 and distance < 3:
                 if random.random() > 0.66 :
+                    # success is +10
                     reward = 10
+                    # The episode will end if the robot scores a point.
                     done = True
                     return np.array(self.agentState),reward, done, {}
                 else:
                     self.shootfail()
                     pass
                 pass
+            # Distance is between 3 and 4 cell
             elif distance >= 3 and distance < 4:
                 if random.random() > 0.10 :
+                    # success is +30
                     reward = 30
+                    # The episode will end if the robot scores a point.
                     done = True
                     return np.array(self.agentState),reward, done, {}
                 else:
                     self.shootfail()
                     pass
                 pass
+            else:
+                self.shootfail()
+                
+                return np.array(self.agentState),reward, done, {}
+                
             pass
-        
-        if agentX < self.col and agentY < self.row and agentX >= 0 and agentY >= 0 and (agentX,agentY) not in self.opponentsState:
+
+        # Determine if the action is still in range
+        isCorrectMove = (agentX < self.col) and (agentY < self.row) and (agentX >= 0 and agentY >= 0)
+        done = not isCorrectMove
+        if done :
+            # If the robot leaves the playing field, it will receive a penalty of -100.
+            # The episode will end if the robot leaves the playing field.
+            reward = -100
+            return np.array(self.agentState), reward, done, {}
+
+        # Determine if the action is still in Observation
+        isHitObservation = (agentX,agentY) in self.opponentsState
+        # 
+        isMoveInBasket = (agentX,agentY) in self.basketState
+        if isCorrectMove and not isHitObservation and not isMoveInBasket:
             self.agentState = (agentX,agentY)
             self.basketballState = (ballX,ballY)
-        else:
-            # If the robot leaves the playing field, it will receive a penalty of -100.
-            reward = -100
             pass
-        
-        done = agentX >= self.col or agentY >= self.row
 
-        
         return np.array(self.agentState), reward, done, {}
 
     def shootfail(self):
-        basketballState = (int(self.col*0.8),self.row//2)
-        basketballX,basketballY = self.stateToPosition(basketballState)
-        self.basketballtrans.set_translation(basketballX,basketballY)
+        self.basketballState = (int(self.col*0.8),self.row//2)
+
 
     def render(self, mode='human'):
         screen_width = self.screen_width
@@ -222,9 +240,13 @@ class basketballEnv(gym.Env):
         
         
 
-        agentWidth = self.block_width * 0.8
-        agentHeight = self.block_height * 0.8
-        minRadius = min(agentWidth,agentHeight)/2
+        personWidth = self.block_width * 0.8
+        personHeight = self.block_height * 0.8
+        minRadius = min(personWidth,personHeight)/2
+
+        # make person point
+        l,r,t,b = -personWidth/2, personWidth/2, personHeight/2, -personHeight/2
+        personPoint = [(l,b), (l,t), (r,t), (r,b)]
 
         # init viewer
         if self.viewer is None:
@@ -246,8 +268,7 @@ class basketballEnv(gym.Env):
                 pass
             
             # make the agent
-            l,r,t,b = -agentWidth/2, agentWidth/2, agentHeight/2, -agentHeight/2
-            agent = rendering.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
+            agent = rendering.FilledPolygon(personPoint)
             self.agenttrans = rendering.Transform()
             agent.add_attr(self.agenttrans)
             agent.set_color(195/255, 41/255, 109/255)
@@ -272,7 +293,7 @@ class basketballEnv(gym.Env):
             # the size and shape is equal the agent
             self.opponenttrans = []
             for opponentPosition in self.opponentsState:
-                opponent = rendering.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
+                opponent = rendering.FilledPolygon(personPoint)
                 opponenttran = rendering.Transform(self.stateToPosition(opponentPosition))
                 opponent.add_attr(opponenttran)
                 self.opponenttrans.append(opponenttran)
@@ -312,17 +333,28 @@ state = None
 speed = 0.1
 
 
-for _ in range(1000):
+# for _ in range(1000):
     
+#     env.render()
+#     if state is not None:
+#         # print("action: {} , state: {}".format(action,state))
+#         if done :
+#             env.reset()
+#     action = int(random.random()*7)
+#     time.sleep(speed)
+    
+#     state, reward, done, _ = env.step(action)
+    
+#     pass
+key = ''
+while True:
     env.render()
-    if state is not None:
-        # print("action: {} , state: {}".format(action,state))
-        if done :
-            env.reset()
-    action = int(random.random()*7)
-    time.sleep(speed)
-    
-    state, reward, done, _ = env.step(action)
-    
+    action = input("action: ")
+    if action == 'q':
+        break
+    state, reward, done, _ = env.step(int(action))
+    print("action: {} , state: {} , reward: {}".format(action,state,reward))
+    if done :
+        env.reset()
     pass
 env.close()
