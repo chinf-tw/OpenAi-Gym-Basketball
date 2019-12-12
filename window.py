@@ -9,10 +9,10 @@ class basketballEnv(gym.Env):
         In this assignment, you will compare the performance of several reinforcement learning algorithms in a simple basketball domain. You will also investigate the impact of different parameters on the performance of the reinforcement learning algorithm.
 
     Version of block number:
-        version     blockColumn      blockRow
-        v0:         9           6
-        v1:         18          12
-        v2:         36          24
+        version     blockColumn     blockRow
+        v0:         9               6
+        v1:         18              12
+        v2:         36              24
 
     Observation: 
         Type: Box(2)
