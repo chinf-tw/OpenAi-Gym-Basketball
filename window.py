@@ -5,6 +5,10 @@ import gym
 import random
 class basketballEnv(gym.Env):
     """
+    Author: CHINF
+    Email:  60875024H@gapps.ntnu.edu.tw
+
+    
     Description:
         In this assignment, you will compare the performance of several reinforcement learning algorithms in a simple basketball domain. You will also investigate the impact of different parameters on the performance of the reinforcement learning algorithm.
 
@@ -326,28 +330,18 @@ state = None
 speed = 0.1
 
 
-# for _ in range(1000):
+for _ in range(1000):
     
-#     env.render()
-#     if state is not None:
-#         # print("action: {} , state: {}".format(action,state))
-#         if done :
-#             env.reset()
-#     action = int(random.random()*7)
-#     time.sleep(speed)
-    
-#     state, reward, done, _ = env.step(action)
-    
-#     pass
-key = ''
-while True:
     env.render()
-    action = input("action: ")
-    if action == 'q':
-        break
-    state, reward, done, _ = env.step(int(action))
-    print("action: {} , state: {} , reward: {}".format(action,state,reward))
-    if done :
-        env.reset()
+    if state is not None:
+        # print("action: {} , state: {}".format(action,state))
+        if done :
+            env.reset()
+    action = int(random.random()*7)
+    time.sleep(speed)
+    
+    state, reward, done, _ = env.step(action)
+    
     pass
+
 env.close()
