@@ -318,36 +318,3 @@ class basketballEnv(gym.Env):
             x,y = self.stateToPosition(self.opponentsState[i])
             self.opponenttrans[i].set_translation(x,y)
         pass
-
-env = basketballEnv("v0")
-
-state = None
-
-speed = 0.1
-
-
-# for _ in range(1000):
-    
-#     env.render()
-#     if state is not None:
-#         # print("action: {} , state: {}".format(action,state))
-#         if done :
-#             env.reset()
-#     action = int(random.random()*7)
-#     time.sleep(speed)
-    
-#     state, reward, done, _ = env.step(action)
-    
-#     pass
-key = ''
-while True:
-    env.render()
-    action = input("action: ")
-    if action == 'q':
-        break
-    state, reward, done, _ = env.step(int(action))
-    print("action: {} , state: {} , reward: {}".format(action,state,reward))
-    if done :
-        env.reset()
-    pass
-env.close()
