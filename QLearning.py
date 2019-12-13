@@ -27,13 +27,22 @@ class QLearning(object):
     def choose_action(self, observation):
         number = self.stateToNumberConverter(observation)
         observationTable = self.qTable[number]
-        maxIndex = observationTable.tolist().index(max(observationTable))
-        return maxIndex
+        maxActions = np.where(observationTable == np.amax(observationTable))[0]
+        
+        if len(maxActions) > 1 :
+            i = int(random.random()*1000) % len(maxActions)
+            action = maxActions[i]
+        else:
+            action = maxActions[0]
+            pass
+            
+        
+        return action
     def epsGreedy(self, observation):
         isRandom = self.epsilon > random.random()
         action = None
         if isRandom :
-            action = int(random.random()*8)
+            action = int(random.random()*1000) % 9
         else:
             action = self.choose_action(observation)
             pass
