@@ -129,12 +129,29 @@ class basketballEnv(gym.Env):
         self.basketballState = (0,self.row - 1)
         self.basketState = (self.col-1, (self.row-1)/2)
         
+        # get ball to reward +5 only once
+        self.isGetBall = False
+
+        # shoot
+        self.isShoot = False
+
 
     def step(self,action):
         agentX,agentY = self.agentState
         ballX,ballY = self.basketballState
-        reward = 0
+        reward = -0.5
         done = False
+
+        # get ball and move to reward -5 and reset
+        if self.isGetBall and action < 4 :
+            reward = -3
+            done = True
+            return np.array([self.agentState,self.isShoot,self.isGetBall]), reward, done, {}
+        elif self.isGetBall and action >= 4:
+            reward = +3
+            pass
+
+
         # Movement
         if action < 4 :
             if action == 0:
@@ -162,6 +179,9 @@ class basketballEnv(gym.Env):
                     ballY -= 1
                     pass
                 pass
+            else:
+                reward = -1
+                pass
             pass
         # Shoot
         elif action == 8 and self.agentState == self.basketballState:
@@ -174,6 +194,7 @@ class basketballEnv(gym.Env):
                     reward = 10
                     # The episode will end if the robot scores a point.
                     done = True
+                    print("***得分！***")
                 else:
                     self.shootfail()
                     pass
@@ -185,6 +206,7 @@ class basketballEnv(gym.Env):
                     reward = 10
                     # The episode will end if the robot scores a point.
                     done = True
+                    print("***得分！***")
                 else:
                     self.shootfail()
                     pass
@@ -195,12 +217,21 @@ class basketballEnv(gym.Env):
                     reward = 30
                     # The episode will end if the robot scores a point.
                     done = True
+                    print("***得分！***")
                 else:
                     self.shootfail()
                     pass
             else:
+                reward = -5
                 self.shootfail()
-            return np.array(self.agentState),reward, done, {}
+            return np.array([self.agentState,self.isShoot,self.isGetBall]),reward, done, {}
+
+        # get ball to reward +5 only once
+        if agentX == ballX and agentY == ballY and not self.isGetBall :
+            reward = 5
+            self.isGetBall = True
+
+        
 
         # Determine if the action is still in range
         isCorrectMove = (agentX < self.col) and (agentY < self.row) and (agentX >= 0 and agentY >= 0)
@@ -209,7 +240,7 @@ class basketballEnv(gym.Env):
             # If the robot leaves the playing field, it will receive a penalty of -100.
             # The episode will end if the robot leaves the playing field.
             reward = -100
-            return np.array(self.agentState), reward, done, {}
+            return np.array([self.agentState,self.isShoot,self.isGetBall]), reward, done, {}
 
         # Determine if the action is still in Observation
         isHitObservation = (agentX,agentY) in self.opponentsState
@@ -220,10 +251,14 @@ class basketballEnv(gym.Env):
             self.basketballState = (ballX,ballY)
             pass
 
-        return np.array(self.agentState), reward, done, {}
+        return np.array([self.agentState,self.isShoot,self.isGetBall]), reward, done, {}
 
     def shootfail(self):
         self.basketballState = (int(self.col*0.8),self.row//2)
+        self.isShoot = True
+        self.isGetBall = False
+        print("***失誤***")
+        
 
 
     def render(self, mode='human'):
@@ -316,7 +351,7 @@ class basketballEnv(gym.Env):
             self.viewer = None
     def reset(self):
         self.initState()
-        for i in range(len(self.opponenttrans)) :
-            x,y = self.stateToPosition(self.opponentsState[i])
-            self.opponenttrans[i].set_translation(x,y)
-        pass
+        # for i in range(len(self.opponenttrans)) :
+        #     x,y = self.stateToPosition(self.opponentsState[i])
+        #     self.opponenttrans[i].set_translation(x,y)
+        # pass
