@@ -91,6 +91,14 @@ class basketballEnv(gym.Env):
 
         # init all state
         self.initState()
+        # init opponentsState
+        self.opponentsState = []
+        while len(self.opponentsState) < self.numberOfOpponent:
+            x = int(random.random()*self.col - 1)
+            y = int(random.random()*self.row - 1)
+            if (x,y) not in self.opponentsState and (x,y) not in [self.agentState,self.basketballState] :
+                self.opponentsState.append((x,y))
+            pass
 
         if len(self.opponentsState) != self.numberOfOpponent :
             raise ValueError("opponents len isn't equal ")
@@ -120,13 +128,7 @@ class basketballEnv(gym.Env):
         self.agentState = (int(random.random()*self.col - 1),int(random.random()*self.row - 1))
         self.basketballState = (0,self.row - 1)
         self.basketState = (self.col-1, (self.row-1)/2)
-        self.opponentsState = []
-        while len(self.opponentsState) < self.numberOfOpponent:
-            x = int(random.random()*self.col - 1)
-            y = int(random.random()*self.row - 1)
-            if (x,y) not in self.opponentsState and (x,y) not in [self.agentState,self.basketballState] :
-                self.opponentsState.append((x,y))
-            pass
+        
 
     def step(self,action):
         agentX,agentY = self.agentState
