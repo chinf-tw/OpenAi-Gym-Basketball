@@ -68,7 +68,7 @@ class basketballEnv(gym.Env):
     Episode Termination:
         The episode will end if the robot scores a point or if the robot leaves the playing field.
     """
-    def __init__(self,v="v0"):
+    def __init__(self,v="v0",opponentsStateFileName=None):
         self.viewer = None
 
         self.screen_width = 600
@@ -92,13 +92,17 @@ class basketballEnv(gym.Env):
         # init all state
         self.initState()
         # init opponentsState
-        self.opponentsState = []
-        while len(self.opponentsState) < self.numberOfOpponent:
-            x = int(random.random()*self.col - 1)
-            y = int(random.random()*self.row - 1)
-            if (x,y) not in self.opponentsState and (x,y) not in [self.agentState,self.basketballState] :
-                self.opponentsState.append((x,y))
-            pass
+        if not opponentsStateFileName == None :
+            from fileHandler import opponentsStateDecode
+            self.opponentsState = opponentsStateDecode(opponentsStateFileName)
+        else:    
+            self.opponentsState = []
+            while len(self.opponentsState) < self.numberOfOpponent:
+                x = int(random.random()*self.col - 1)
+                y = int(random.random()*self.row - 1)
+                if (x,y) not in self.opponentsState and (x,y) not in [self.agentState,self.basketballState] :
+                    self.opponentsState.append((x,y))
+                pass
 
         if len(self.opponentsState) != self.numberOfOpponent :
             raise ValueError("opponents len isn't equal ")
@@ -135,6 +139,8 @@ class basketballEnv(gym.Env):
         # shoot
         self.isShoot = False
 
+    def GetOpponentsState(self):
+        return self.opponentsState
 
     def step(self,action):
         agentX,agentY = self.agentState
