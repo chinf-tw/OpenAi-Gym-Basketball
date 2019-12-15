@@ -4,11 +4,15 @@ import random
 import time
 
 env = basketballEnv("v0")
-newState = None
-oldState = None
+nextState = None
+originalState = None
 speed = 0.1
 done = False
-isShoot = False
+nextIsShoot = False
+originalIsShoot = False
+
+NextIsGetBall = False
+originalIsGetBall = False
 
 qlearningBall = QLearning(env.col,env.row,9,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
 qlearningShoot = QLearning(env.col,env.row,9,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
@@ -19,7 +23,7 @@ reward = None
 while True:
     env.render()
     
-    if newState is not None :
+    if nextState is not None :
         if done :
             env.reset()
             
@@ -30,24 +34,23 @@ while True:
             if reward == 10 or reward == 30 :
                 print(successAction)
             successAction = []
-            # if not isShoot :
-            #     print(qlearningBall.qTable.astype(int))
-            # else:
-            #     print(qlearningShoot.qTable.astype(int))
-            #     pass
-        oldState = newState
+        originalState = nextState
 
-
-        if not isShoot :
-            action = qlearningBall.epsGreedy(oldState)
+        originalIsShoot = nextIsShoot
+        originalIsGetBall = NextIsGetBall
+        if not originalIsShoot :
+            if NextIsGetBall :
+                action = qlearningGetBall.epsGreedy(originalState)
+            else:
+                action = qlearningBall.epsGreedy(originalState)
         else:
-            action = qlearningShoot.epsGreedy(oldState)
+            action = qlearningShoot.epsGreedy(originalState)
             pass
     else:
         action = int(random.random()*1000) % 9
         pass
     state, reward, done, _ = env.step(action)
-    newState,isShoot,isGetBall = state
+    nextState,nextIsShoot,NextIsGetBall = state
     successAction.append(action)
     # if isShoot :
     #     print(action)
@@ -56,13 +59,13 @@ while True:
     #         break
 
     
-    if oldState is not None :
-        if isGetBall :
-            qlearningGetBall.Learning(oldState,newState,action,reward)
-        elif isShoot :
-            qlearningShoot.Learning(oldState,newState,action,reward)
+    if originalState is not None :
+        if originalIsGetBall :
+            qlearningGetBall.Learning(originalState,nextState,action,reward)
+        elif originalIsShoot :
+            qlearningShoot.Learning(originalState,nextState,action,reward)
         else:
-            qlearningBall.Learning(oldState,newState,action,reward)
+            qlearningBall.Learning(originalState,nextState,action,reward)
             pass
     pass
 
