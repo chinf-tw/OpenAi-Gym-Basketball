@@ -1,9 +1,12 @@
 from window import basketballEnv
 from QLearning import QLearning
+from fileHandler import opponentsStateEncode
+
 import random
 import time
+import os
 
-env = basketballEnv("v0")
+opponentsStateFileName = "v0.opponents"
 nextState = None
 originalState = None
 speed = 0.1
@@ -14,12 +17,39 @@ originalIsShoot = False
 NextIsGetBall = False
 originalIsGetBall = False
 
-qlearningBall = QLearning(env.col,env.row,9,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
-qlearningShoot = QLearning(env.col,env.row,9,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
-qlearningGetBall = QLearning(env.col,env.row,9,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
 i = 0
-successAction = []
+Episode = 0
+# successAction = []
 reward = None
+
+if os.path.isfile(opponentsStateFileName) :
+    env = basketballEnv("v0",opponentsStateFileName)
+else:
+    env = basketballEnv("v0")
+    opponentsStateEncode(env.GetOpponentsState(),opponentsStateFileName)
+
+
+
+qlearningBallFileName = "qlearningBall.npy"
+if os.path.isfile(qlearningBallFileName) :
+    qlearningBall = QLearning(env.col,env.row,9,qTableFileName=qlearningBallFileName,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
+else:
+    qlearningBall = QLearning(env.col,env.row,9,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
+    pass
+
+qlearningShootFileName = "qlearningShoot.npy"
+if os.path.isfile(qlearningShootFileName) :
+    qlearningShoot = QLearning(env.col,env.row,9,qTableFileName=qlearningShootFileName,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
+else:
+    qlearningShoot = QLearning(env.col,env.row,9,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
+    pass
+
+qlearningGetBallFileName = "qlearningGetBall.npy"
+if os.path.isfile(qlearningGetBallFileName) :
+    qlearningGetBall = QLearning(env.col,env.row,9,qTableFileName=qlearningGetBallFileName,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
+else:
+    qlearningGetBall = QLearning(env.col,env.row,9,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
+    pass
 while True:
     env.render()
     
@@ -29,11 +59,15 @@ while True:
             
             i += 1
             if i > 100 :
-                print("***100次了***")
+                Episode += 1
+                print("*** {} Episode ***".format(Episode*100))
                 i = 0
-            if reward == 10 or reward == 30 :
-                print(successAction)
-            successAction = []
+                qlearningBall.SaveQTable(qlearningBallFileName)
+                qlearningShoot.SaveQTable(qlearningShootFileName)
+                qlearningGetBall.SaveQTable(qlearningGetBallFileName)
+            # if reward == 10 or reward == 30 :
+                # print(successAction)
+            # successAction = []
         originalState = nextState
 
         originalIsShoot = nextIsShoot
@@ -51,7 +85,7 @@ while True:
         pass
     state, reward, done, _ = env.step(action)
     nextState,nextIsShoot,NextIsGetBall = state
-    successAction.append(action)
+    # successAction.append(action)
     # if isShoot :
     #     print(action)
     #     i += 1
