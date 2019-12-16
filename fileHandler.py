@@ -1,4 +1,6 @@
 import os
+import json
+import datetime
 
 def opponentsStateDecode(opponentsStateFileName):
     if not os.path.isfile(opponentsStateFileName) :
@@ -12,5 +14,34 @@ def opponentsStateDecode(opponentsStateFileName):
 def opponentsStateEncode(opponentsState,fileName):
     with open(fileName,'w') as f:
         f.write(str(opponentsState))
+        pass
+    pass
+
+class TrainingInfo(object):
+    def __init__(self,fileName):
+        self.fileName = fileName
+        with open(self.fileName,'r') as r:
+            data = r.read()
+            data = json.loads(data)
+            self.Episode = int(data['Episode'])
+            self.EndTime = data['EndTime']
+            self.RewardSum = data['RewardSum']
+            pass
+        pass
+    def IsEnd(self):
+        judgementFile = "End"
+        isEnd = os.path.exists(judgementFile)
+        if isEnd :
+            os.remove(judgementFile)
+        return isEnd
+    def Save(self):
+        data = {
+            'Episode' : self.Episode,
+            'EndTime' : str(datetime.datetime.now()),
+            'RewardSum' : self.RewardSum
+        }
+        with open(self.fileName,'w') as w:
+            w.write(json.dumps(data))
+            pass
         pass
     pass
