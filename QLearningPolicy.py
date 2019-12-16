@@ -6,7 +6,9 @@ import random
 import time
 import os
 
-opponentsStateFileName = "v0.opponents"
+v0_dir = "./v0-Qlearning-model"
+version = "v0"
+opponentsStateFileName = "{}/{}.opponents".format(v0_dir,version)
 nextState = None
 originalState = None
 speed = 0.1
@@ -26,33 +28,33 @@ if isRender :
 else:
     updateEpisode = 1000
     
-trainInfo = TrainingInfo("v0_TrainingInfo.json")
+trainInfo = TrainingInfo("{}/{}_TrainingInfo.json".format(v0_dir,version))
 # successAction = []
 reward = None
 
 if os.path.isfile(opponentsStateFileName) :
-    env = basketballEnv("v0",opponentsStateFileName)
+    env = basketballEnv(version,opponentsStateFileName)
 else:
-    env = basketballEnv("v0")
+    env = basketballEnv(version)
     opponentsStateEncode(env.GetOpponentsState(),opponentsStateFileName)
 
 
 
-qlearningBallFileName = "qlearningBall.npy"
+qlearningBallFileName = "{}/{}_qlearningBall.npy".format(v0_dir,version)
 if os.path.isfile(qlearningBallFileName) :
     qlearningBall = QLearning(env.col,env.row,9,qTableFileName=qlearningBallFileName,learning_rate=0.1, reward_decay=0.9, e_greedy=0.1)
 else:
     qlearningBall = QLearning(env.col,env.row,9,learning_rate=0.1, reward_decay=0.9, e_greedy=0.1)
     pass
 
-qlearningShootFileName = "qlearningShoot.npy"
+qlearningShootFileName = "{}/{}_qlearningShoot.npy".format(v0_dir,version)
 if os.path.isfile(qlearningShootFileName) :
     qlearningShoot = QLearning(env.col,env.row,9,qTableFileName=qlearningShootFileName,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
 else:
     qlearningShoot = QLearning(env.col,env.row,9,learning_rate=0.1, reward_decay=0.9, e_greedy=0.1)
     pass
 
-qlearningGetBallFileName = "qlearningGetBall.npy"
+qlearningGetBallFileName = "{}/{}_qlearningGetBall.npy".format(v0_dir,version)
 if os.path.isfile(qlearningGetBallFileName) :
     qlearningGetBall = QLearning(env.col,env.row,9,qTableFileName=qlearningGetBallFileName,learning_rate=0.1, reward_decay=0.9, e_greedy=0.1)
 else:
