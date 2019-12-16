@@ -145,7 +145,7 @@ class basketballEnv(gym.Env):
     def step(self,action):
         agentX,agentY = self.agentState
         ballX,ballY = self.basketballState
-        reward = -0.5
+        reward = -2
         done = False
 
         # get ball and move to reward -5 and reset
@@ -186,7 +186,7 @@ class basketballEnv(gym.Env):
                     pass
                 pass
             else:
-                reward = -1
+                reward = -3
                 pass
             pass
         # Shoot

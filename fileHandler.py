@@ -20,14 +20,21 @@ def opponentsStateEncode(opponentsState,fileName):
 class TrainingInfo(object):
     def __init__(self,fileName):
         self.fileName = fileName
-        with open(self.fileName,'r') as r:
-            data = r.read()
-            data = json.loads(data)
-            self.Episode = int(data['Episode'])
-            self.EndTime = data['EndTime']
-            self.RewardSum = data['RewardSum']
+        self.Episode = 0
+        self.EndTime = None
+        self.RewardSum = 0
+        
+        if os.path.isfile(fileName) :
+            with open(self.fileName,'r') as r:
+                data = r.read()
+                data = json.loads(data)
+                self.Episode = int(data['Episode'])
+                self.EndTime = data['EndTime']
+                self.RewardSum = data['RewardSum']
+                pass
             pass
-        pass
+        else:
+            self.Save()
     def IsEnd(self):
         judgementFile = "End"
         isEnd = os.path.exists(judgementFile)

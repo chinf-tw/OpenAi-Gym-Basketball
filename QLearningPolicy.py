@@ -6,9 +6,9 @@ import random
 import time
 import os
 
-v0_dir = "./v0-Qlearning-model"
-version = "v0"
-opponentsStateFileName = "{}/{}.opponents".format(v0_dir,version)
+directory = "v0-Qlearning-model"
+version = "v1"
+opponentsStateFileName = "{}/{}.opponents".format(directory,version)
 nextState = None
 originalState = None
 speed = 0.1
@@ -24,11 +24,11 @@ rewardSum = 0
 
 isRender = True
 if isRender :
-    updateEpisode = 100
+    updateEpisode = 10
 else:
     updateEpisode = 1000
     
-trainInfo = TrainingInfo("{}/{}_TrainingInfo.json".format(v0_dir,version))
+trainInfo = TrainingInfo("{}/{}_TrainingInfo.json".format(directory,version))
 # successAction = []
 reward = None
 
@@ -40,21 +40,21 @@ else:
 
 
 
-qlearningBallFileName = "{}/{}_qlearningBall.npy".format(v0_dir,version)
+qlearningBallFileName = "{}/{}_qlearningBall.npy".format(directory,version)
 if os.path.isfile(qlearningBallFileName) :
     qlearningBall = QLearning(env.col,env.row,9,qTableFileName=qlearningBallFileName,learning_rate=0.1, reward_decay=0.9, e_greedy=0.1)
 else:
     qlearningBall = QLearning(env.col,env.row,9,learning_rate=0.1, reward_decay=0.9, e_greedy=0.1)
     pass
 
-qlearningShootFileName = "{}/{}_qlearningShoot.npy".format(v0_dir,version)
+qlearningShootFileName = "{}/{}_qlearningShoot.npy".format(directory,version)
 if os.path.isfile(qlearningShootFileName) :
-    qlearningShoot = QLearning(env.col,env.row,9,qTableFileName=qlearningShootFileName,learning_rate=0.1, reward_decay=0.9, e_greedy=0.2)
+    qlearningShoot = QLearning(env.col,env.row,9,qTableFileName=qlearningShootFileName,learning_rate=0.1, reward_decay=0.9, e_greedy=0.1)
 else:
     qlearningShoot = QLearning(env.col,env.row,9,learning_rate=0.1, reward_decay=0.9, e_greedy=0.1)
     pass
 
-qlearningGetBallFileName = "{}/{}_qlearningGetBall.npy".format(v0_dir,version)
+qlearningGetBallFileName = "{}/{}_qlearningGetBall.npy".format(directory,version)
 if os.path.isfile(qlearningGetBallFileName) :
     qlearningGetBall = QLearning(env.col,env.row,9,qTableFileName=qlearningGetBallFileName,learning_rate=0.1, reward_decay=0.9, e_greedy=0.1)
 else:
