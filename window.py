@@ -200,7 +200,7 @@ class basketballEnv(gym.Env):
                     reward = 10
                     # The episode will end if the robot scores a point.
                     done = True
-                    print("***得分！***")
+                    print("***Get 10 point！***")
                 else:
                     self.shootfail()
                     pass
@@ -212,7 +212,7 @@ class basketballEnv(gym.Env):
                     reward = 10
                     # The episode will end if the robot scores a point.
                     done = True
-                    print("***得分！***")
+                    print("***Get 10 point！***")
                 else:
                     self.shootfail()
                     pass
@@ -223,13 +223,13 @@ class basketballEnv(gym.Env):
                     reward = 30
                     # The episode will end if the robot scores a point.
                     done = True
-                    print("***得分！***")
+                    print("***Get 30 point！***")
                 else:
                     self.shootfail()
                     pass
             else:
                 reward = -5
-                self.shootfail()
+                self.shootfail(reward)
             return np.array([self.agentState,self.isShoot,self.isGetBall]),reward, done, {}
 
         # get ball to reward +5 only once
@@ -259,11 +259,11 @@ class basketballEnv(gym.Env):
 
         return np.array([self.agentState,self.isShoot,self.isGetBall]), reward, done, {}
 
-    def shootfail(self):
+    def shootfail(self,reward=0):
         self.basketballState = (int(self.col*0.8),self.row//2)
         self.isShoot = True
         self.isGetBall = False
-        print("***失誤***")
+        print("***Fail {} point***".format(reward))
         
 
 
