@@ -5,3 +5,4 @@ __pycache__
 End
 *.json
 .vscode
+*.csv

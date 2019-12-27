@@ -6,8 +6,16 @@ import random
 import time
 import os
 
-directory = "v0-Qlearning-model"
-version = "v1"
+directory = "v2-Qlearning-model"
+version = "v"
+
+if not os.path.isdir(directory) :
+    print("add the {} directory".format(directory))
+    os.mkdir(directory)
+else:
+    print("Great {} is exists".format(directory))
+    pass
+
 opponentsStateFileName = "{}/{}.opponents".format(directory,version)
 nextState = None
 originalState = None
@@ -22,13 +30,17 @@ originalIsGetBall = False
 i = 0
 rewardSum = 0
 
-isRender = True
+
+
+
+r = input("Is want to Render?")
+isRender = int(r)
 if isRender :
     updateEpisode = 10
 else:
     updateEpisode = 1000
     
-trainInfo = TrainingInfo("{}/{}_TrainingInfo.json".format(directory,version))
+trainInfo = TrainingInfo("{}/{}_TrainingInfo.csv".format(directory,version))
 # successAction = []
 reward = None
 
@@ -72,11 +84,14 @@ while True:
             if i > updateEpisode :
                 
 
-                trainInfo.Episode += updateEpisode
-                trainInfo.RewardSum = rewardSum
-                trainInfo.Save()
+                trainInfo.trainingInfo["Episode"] += updateEpisode
+                Episode = trainInfo.trainingInfo["Episode"]
 
-                print("*** {} Episode ***".format(trainInfo.Episode))
+                trainInfo.trainingInfo["RewardSum"] = round(rewardSum/updateEpisode,3)
+                trainInfo.Save()
+                # print(round(trainInfo.trainingInfo,3))
+                trainInfo.InitBadInfoCount()
+                print("*** {} Episode ***".format(Episode))
 
                 i = 0
                 rewardSum = 0
@@ -85,6 +100,12 @@ while True:
                 qlearningBall.SaveQTable(qlearningBallFileName)
                 qlearningShoot.SaveQTable(qlearningShootFileName)
                 qlearningGetBall.SaveQTable(qlearningGetBallFileName)
+
+                if Episode < 1000 :
+                    qlearningBall.epsilon = 0.1 + 0.5/(1+Episode)
+                    qlearningShoot.epsilon = 0.1 + 0.5/(1+Episode)
+                    qlearningGetBall.epsilon = 0.1 + 0.5/(1+Episode)
+                
 
                 if trainInfo.IsEnd() :
                     env.close()
@@ -108,15 +129,14 @@ while True:
     else:
         action = int(random.random()*1000) % 9
         pass
-    state, reward, done, _ = env.step(action)
+    state, reward, done, info = env.step(action)
     nextState,nextIsShoot,NextIsGetBall = state
     rewardSum += reward
-    # successAction.append(action)
-    # if isShoot :
-    #     print(action)
-    #     i += 1
-    #     if i > 100 :
-    #         break
+    for title in trainInfo.trainingInfo :
+        if title in info :
+            if info[title] :
+                trainInfo.trainingInfo[title] += 1/updateEpisode
+        
 
     
     if originalState is not None :
