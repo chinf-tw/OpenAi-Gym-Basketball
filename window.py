@@ -90,19 +90,24 @@ class basketballEnv(gym.Env):
         self.block_height = self.screen_height / self.row
 
         # init all state
-        self.initState()
+        self.basketState = (self.col-1, (self.row-1)/2)
         # init opponentsState
         if not opponentsStateFileName == None :
             from fileHandler import opponentsStateDecode
             self.opponentsState = opponentsStateDecode(opponentsStateFileName)
+            self.initState()
         else:    
             self.opponentsState = []
+            self.initState()
             while len(self.opponentsState) < self.numberOfOpponent:
                 x = int(random.random()*self.col - 1)
                 y = int(random.random()*self.row - 1)
                 if (x,y) not in self.opponentsState and (x,y) not in [self.agentState,self.basketballState] :
                     self.opponentsState.append((x,y))
                 pass
+            pass
+        
+        pass
 
         if len(self.opponentsState) != self.numberOfOpponent :
             raise ValueError("opponents len isn't equal ")
@@ -129,9 +134,11 @@ class basketballEnv(gym.Env):
         
     def initState(self):
         # self.agentState = (0,0)
+        
         self.agentState = (int(random.random()*self.col - 1),int(random.random()*self.row - 1))
+        while self.agentState in self.opponentsState :
+            self.agentState = (int(random.random()*self.col - 1),int(random.random()*self.row - 1))
         self.basketballState = (0,self.row - 1)
-        self.basketState = (self.col-1, (self.row-1)/2)
         
         # get ball to reward +5 only once
         self.isGetBall = False
@@ -145,17 +152,23 @@ class basketballEnv(gym.Env):
     def step(self,action):
         agentX,agentY = self.agentState
         ballX,ballY = self.basketballState
-        reward = -2
+        reward = -5
         done = False
+
+        isGoOutBall = False
+        isGoOutSide = False
+        isOutSideShoot = False
+        isUseBadAction = False
 
         # get ball and move to reward -5 and reset
         if self.isGetBall and action < 4 :
-            reward = -3
+            reward = -10
             done = True
-            return np.array([self.agentState,self.isShoot,self.isGetBall]), reward, done, {}
-        elif self.isGetBall and action >= 4:
-            reward = +3
-            pass
+            isGoOutBall = True
+            return np.array([self.agentState,self.isShoot,self.isGetBall]), reward, done, {"isGoOutBall" : isGoOutBall}
+        # elif self.isGetBall and action >= 4:
+        #     reward = +3
+        #     pass
 
 
         # Movement
@@ -186,7 +199,8 @@ class basketballEnv(gym.Env):
                     pass
                 pass
             else:
-                reward = -3
+                reward = -10
+                isUseBadAction = True
                 pass
             pass
         # Shoot
@@ -228,9 +242,10 @@ class basketballEnv(gym.Env):
                     self.shootfail()
                     pass
             else:
-                reward = -5
+                reward = -10
                 self.shootfail(reward)
-            return np.array([self.agentState,self.isShoot,self.isGetBall]),reward, done, {}
+                isOutSideShoot = True
+            return np.array([self.agentState,self.isShoot,self.isGetBall]),reward, done, {"isOutSideShoot" : isOutSideShoot}
 
         # get ball to reward +5 only once
         if agentX == ballX and agentY == ballY and not self.isGetBall :
@@ -246,7 +261,8 @@ class basketballEnv(gym.Env):
             # If the robot leaves the playing field, it will receive a penalty of -100.
             # The episode will end if the robot leaves the playing field.
             reward = -100
-            return np.array([self.agentState,self.isShoot,self.isGetBall]), reward, done, {}
+            isGoOutSide = True
+            return np.array([self.agentState,self.isShoot,self.isGetBall]), reward, done, {"isGoOutSide" : isGoOutSide}
 
         # Determine if the action is still in Observation
         isHitObservation = (agentX,agentY) in self.opponentsState
@@ -257,7 +273,7 @@ class basketballEnv(gym.Env):
             self.basketballState = (ballX,ballY)
             pass
 
-        return np.array([self.agentState,self.isShoot,self.isGetBall]), reward, done, {}
+        return np.array([self.agentState,self.isShoot,self.isGetBall]), reward, done, {"isUseBadAction" : isUseBadAction}
 
     def shootfail(self,reward=0):
         self.basketballState = (int(self.col*0.8),self.row//2)
