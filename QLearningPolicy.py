@@ -7,7 +7,7 @@ import time
 import os
 
 directory = "v2-Qlearning-model"
-version = "v"
+version = "v0"
 
 if not os.path.isdir(directory) :
     print("add the {} directory".format(directory))
