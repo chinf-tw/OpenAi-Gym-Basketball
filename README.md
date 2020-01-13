@@ -37,3 +37,8 @@ example:
 ```bash
 python3 QLearningPolicy.py -d v1-Qlearning-model -v v1
 ```
+
+## References
+1. Using Python cli tools `Argparse`
+2. Using OpenAi gym `from gym.envs.classic_control import rendering`
+3. Practical `jacky.baltes` homework [Reinforcement Learning - Assignment - Basketball](https://docs.google.com/document/u/1/d/e/2PACX-1vT0XRvEbnPDnAAlKCo1DP-8IFMccMgKfWaIBxO0n24CPDSE9PNfZOB10WS1zt9DlUPV8yEVzSOjgZmq/pub)
