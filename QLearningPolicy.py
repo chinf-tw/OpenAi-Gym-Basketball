@@ -5,15 +5,22 @@ from fileHandler import opponentsStateEncode,TrainingInfo
 import random
 import time
 import os
+import argparse
 
-directory = "v2-Qlearning-model"
-version = "v0"
+parser = argparse.ArgumentParser()
+parser.add_argument("-d","--directory", default="v0-Qlearning-model", help="use the directory to place data model (default is 'v0-Qlearning-model')")
+parser.add_argument("-v","--version", default="v0", help="choose the version to train model (now have v0,v1,v2)(default is 'v0')")
+args = parser.parse_args()
+
+directory = args.directory
+version = args.version
 
 if not os.path.isdir(directory) :
     print("add the {} directory".format(directory))
     os.mkdir(directory)
+    print("choose the {} version".format(version))
 else:
-    print("Great {} is exists".format(directory))
+    print("Great! {} is exists".format(directory))
     pass
 
 opponentsStateFileName = "{}/{}.opponents".format(directory,version)
@@ -33,7 +40,7 @@ rewardSum = 0
 
 
 
-r = input("Is want to Render?")
+r = input("Do you want to Render?")
 isRender = int(r)
 if isRender :
     updateEpisode = 10
