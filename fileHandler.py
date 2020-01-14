@@ -34,7 +34,7 @@ class TrainingInfo(object):
 
         for title in self.csvTitle :
             self.trainingInfo[title] = 0
-        self.InitBadInfoCount()
+        # self.InitBadInfoCount()
     
         if os.path.isfile(fileName) :
             with open(self.fileName,'r') as csvFile:

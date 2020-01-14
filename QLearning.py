@@ -3,7 +3,7 @@ import random
 
 class QLearning(object):
     
-    def __init__(self, colLen, rowLen, actionLen, qTableFileName=None, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9):
+    def __init__(self, colLen, rowLen, actionLen, qTableFileName=None, learning_rate=0.01, reward_decay=0.9, eps=0.9):
         self.colLen, self.rowLen = colLen,rowLen
         if not qTableFileName == None :
             self.qTable = np.load(qTableFileName)
@@ -12,7 +12,7 @@ class QLearning(object):
         # self.actions = actions      # a list
         self.lr = learning_rate     # 學習率
         self.gamma = reward_decay   # 奖励衰减
-        self.epsilon = e_greedy     # 貪婪度
+        self.epsilon = eps     # 貪婪度
         pass
     
     def initQTable(self, colLen, rowLen, actionLen):
@@ -39,7 +39,7 @@ class QLearning(object):
             action = maxActions[0]
             pass
         return action
-    def epsGreedy(self, observation):
+    def epsGreedySearch(self, observation):
         isRandom = self.epsilon > random.random()
         action = None
         if isRandom :
