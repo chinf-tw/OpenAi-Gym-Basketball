@@ -27,10 +27,5 @@ We can saw that the agent leaved the playing field 8 in last 100 episodes,this r
 I saw this figure,I thought about WTF... what went wrong?  
 So I tried to render that, I saw...  
 ![wrong](img/wrong.gif)
-<video controls autoplay>
-    <source src="img/wrong.mov" type="video/mp4">
-</video>  
 Finally, I retrained 5000 episodes with `epsGreedy = 0.1`, finally rendering was:
-<video controls autoplay>
-    <source src="img/fianlly.mov" type="video/mp4">
-</video>  
+![](https://media.giphy.com/media/fY5QI1PuF7z8gLiL0a/giphy.gif)
