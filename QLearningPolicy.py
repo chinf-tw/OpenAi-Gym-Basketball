@@ -90,36 +90,36 @@ while args.end == -1 or args.end:
         if done :
             env.reset()
             
-        i += 1
-        if i >= updateEpisode :
-            
+            i += 1
+            if i >= updateEpisode :
+                
 
-            trainInfo.trainingInfo["Episode"] += updateEpisode
-            Episode = trainInfo.trainingInfo["Episode"]
+                trainInfo.trainingInfo["Episode"] += updateEpisode
+                Episode = trainInfo.trainingInfo["Episode"]
 
-            trainInfo.trainingInfo["RewardSum"] = round(rewardSum/updateEpisode,3)
-            trainInfo.Save()
-            # print(round(trainInfo.trainingInfo,3))
-            trainInfo.InitBadInfoCount()
-            print("*** {} Episode ***".format(Episode))
+                trainInfo.trainingInfo["RewardSum"] = round(rewardSum/updateEpisode,3)
+                trainInfo.Save()
+                # print(round(trainInfo.trainingInfo,3))
+                trainInfo.InitBadInfoCount()
+                print("*** {} Episode ***".format(Episode))
 
-            i = 0
-            rewardSum = 0
+                i = 0
+                rewardSum = 0
 
 
-            qlearningBall.SaveQTable(qlearningBallFileName)
-            qlearningShoot.SaveQTable(qlearningShootFileName)
-            qlearningGetBall.SaveQTable(qlearningGetBallFileName)
+                qlearningBall.SaveQTable(qlearningBallFileName)
+                qlearningShoot.SaveQTable(qlearningShootFileName)
+                qlearningGetBall.SaveQTable(qlearningGetBallFileName)
 
-            # if Episode < 1000 :
-            #     qlearningBall.epsilon = 0.1 + 0.5/(1+Episode)
-            #     qlearningShoot.epsilon = 0.1 + 0.5/(1+Episode)
-            #     qlearningGetBall.epsilon = 0.1 + 0.5/(1+Episode)
-            
+                # if Episode < 1000 :
+                #     qlearningBall.epsilon = 0.1 + 0.5/(1+Episode)
+                #     qlearningShoot.epsilon = 0.1 + 0.5/(1+Episode)
+                #     qlearningGetBall.epsilon = 0.1 + 0.5/(1+Episode)
+                
 
-            if trainInfo.IsEnd() :
-                env.close()
-                break
+                if trainInfo.IsEnd() :
+                    env.close()
+                    break
                 
         originalState = nextState
 
