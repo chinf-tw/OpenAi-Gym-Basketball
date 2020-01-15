@@ -13,7 +13,7 @@ To reach my goal faster, I used `three QTables`, these tables are used:
 
 ## Tring Training
 ### Try to train 10000 episodes (epsGreedy = 0.1)
-![training 10000 Episode](img/training&#32;10000&#32;Episode.svg)
+![training 10000 Episode](img/training&#32;10000&#32;Episode.svg)  
 We can saw that,`isGoOutSide` was obvious convergence near 1000 episodes,and `isOutSideShoot` was better with after 6000 episodes but that wasn't obvious.  
 
 I guess `isGoOutSide` wasn't convergence to 0 because epsGreedy,so I tried to use `epsGreedy = 0.1` with 2000 episodes,and tried to use `epsGreedy = 0` after 2000 episodes,and retraining 2000 episodes.
