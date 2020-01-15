@@ -26,7 +26,7 @@ class TrainingInfo(object):
         
 
         self.StatusDataTitle = ["Episode","RewardSum"]
-        self.BadInfoTitle = ["isUseBadAction","isGoOutSide","isOutSideShoot","isGoOutBall"]
+        self.BadInfoTitle = ["isGoOutSide","isOutSideShoot","isGoOutBall"]
         for title in self.StatusDataTitle :
             self.csvTitle.append(title)
         for title in self.BadInfoTitle :
@@ -34,7 +34,8 @@ class TrainingInfo(object):
 
         for title in self.csvTitle :
             self.trainingInfo[title] = 0
-        # self.InitBadInfoCount()
+
+        self.csvTitle.append("isUseBadAction")
     
         if os.path.isfile(fileName) :
             with open(self.fileName,'r') as csvFile:
@@ -68,7 +69,17 @@ class TrainingInfo(object):
     def Save(self):
         data = []
         for title in self.csvTitle :
-            data.append(round(self.trainingInfo[title],3))
+            
+            if title == "isUseBadAction" :
+                count = 0
+                for tit in self.BadInfoTitle :
+                    count += self.trainingInfo[tit]
+                    pass
+                count = round(count,3)
+            else :
+                count = round(self.trainingInfo[title],3)
+                pass
+            data.append(count)
         with open(self.fileName,'a') as w:
             writer = csv.writer(w)
             writer.writerow(data)

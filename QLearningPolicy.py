@@ -90,6 +90,8 @@ while args.end == -1 or args.end:
         if done :
             env.reset()
             
+            if not args.end == -1:
+                args.end -= 1
             i += 1
             if i >= updateEpisode :
                 
@@ -154,7 +156,6 @@ while args.end == -1 or args.end:
         else:
             qlearningBall.Learning(originalState,nextState,action,reward)
             pass
-        if not args.end == -1:
-            args.end -= 1
+        
     pass
 

@@ -158,7 +158,6 @@ class basketballEnv(gym.Env):
         isGoOutBall = False
         isGoOutSide = False
         isOutSideShoot = False
-        isUseBadAction = False
 
         # get ball and move to reward -5 and reset
         if self.isGetBall and action < 4 :
@@ -200,7 +199,6 @@ class basketballEnv(gym.Env):
                 pass
             else:
                 reward = -10
-                isUseBadAction = True
                 pass
             pass
         # Shoot
@@ -273,7 +271,7 @@ class basketballEnv(gym.Env):
             self.basketballState = (ballX,ballY)
             pass
 
-        return np.array([self.agentState,self.isShoot,self.isGetBall]), reward, done, {"isUseBadAction" : isUseBadAction}
+        return np.array([self.agentState,self.isShoot,self.isGetBall]), reward, done, {}
 
     def shootfail(self,reward=0):
         self.basketballState = (int(self.col*0.8),self.row//2)
